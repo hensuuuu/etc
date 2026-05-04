@@ -16,13 +16,14 @@
     "appId": "com.html2image.app",
     "productName": "HTML to Image",
     "linux": {
-      "target": ["AppImage", "deb"]
+      "target": ["AppImage"]
     },
     "win": {
       "target": ["nsis"]
     },
     "mac": {
-      "target": ["dmg"]
+      "target": ["dmg"],
+      "category": "public.app-category.utilities"
     }
   }
 }

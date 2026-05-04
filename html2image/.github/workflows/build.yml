@@ -1,0 +1,101 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            platform: mac
+          - os: windows-latest
+            platform: win
+          - os: ubuntu-latest
+            platform: linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: html2image
+
+      - name: Build (Mac)
+        if: matrix.platform == 'mac'
+        run: npx electron-builder --mac dmg
+        working-directory: html2image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build (Windows)
+        if: matrix.platform == 'win'
+        run: npx electron-builder --win nsis
+        working-directory: html2image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build (Linux)
+        if: matrix.platform == 'linux'
+        run: npx electron-builder --linux AppImage
+        working-directory: html2image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Mac
+        if: matrix.platform == 'mac'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac
+          path: html2image/dist/*.dmg
+
+      - name: Upload Windows
+        if: matrix.platform == 'win'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: html2image/dist/*.exe
+
+      - name: Upload Linux
+        if: matrix.platform == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: html2image/dist/*.AppImage
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/mac/*.dmg
+            artifacts/windows/*.exe
+            artifacts/linux/*.AppImage
+          body: |
+            ## HTML to Image ${{ github.ref_name }}
+
+            ### 다운로드
+            | OS | 파일 |
+            |---|---|
+            | Mac | `.dmg` 다운로드 후 드래그 설치 |
+            | Windows | `.exe` 다운로드 후 더블클릭 설치 |
+            | Linux | `.AppImage` 다운로드 후 더블클릭 실행 |
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
