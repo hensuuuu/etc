@@ -1,0 +1,28 @@
+{
+  "name": "html2image",
+  "version": "1.0.0",
+  "description": "HTML 코드를 이미지로 변환하는 PC 앱",
+  "main": "main.js",
+  "scripts": {
+    "start": "ELECTRON_RUN_AS_NODE= xvfb-run --auto-servernum electron . --no-sandbox --disable-gpu",
+    "start:display": "ELECTRON_RUN_AS_NODE= electron . --no-sandbox",
+    "build": "ELECTRON_RUN_AS_NODE= electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.html2image.app",
+    "productName": "HTML to Image",
+    "linux": {
+      "target": ["AppImage", "deb"]
+    },
+    "win": {
+      "target": ["nsis"]
+    },
+    "mac": {
+      "target": ["dmg"]
+    }
+  }
+}

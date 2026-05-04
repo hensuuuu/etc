@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한국 정기결제 PG사 비교</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; padding: 32px 16px; }
+  h1 { text-align: center; font-size: 1.6rem; margin-bottom: 8px; color: #f8fafc; }
+  .subtitle { text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 32px; }
+
+  .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #1e293b; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 1100px; }
+  thead tr { background: #1e293b; }
+  thead th { padding: 12px 14px; text-align: center; color: #94a3b8; font-weight: 600; white-space: nowrap; border-bottom: 1px solid #334155; }
+  thead th:first-child { text-align: left; }
+
+  tbody tr { border-bottom: 1px solid #1e293b; transition: background 0.15s; }
+  tbody tr:hover { background: #1a2233; }
+  tbody tr:last-child { border-bottom: none; }
+
+  td { padding: 11px 14px; vertical-align: middle; text-align: center; }
+  td:first-child { text-align: left; }
+
+  .pg-name { font-weight: 700; font-size: 0.9rem; color: #f1f5f9; white-space: nowrap; }
+  .pg-site { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+  .badge-blue { background: #1d4ed8; color: #bfdbfe; }
+  .badge-purple { background: #6d28d9; color: #ede9fe; }
+  .badge-teal { background: #0f766e; color: #99f6e4; }
+  .badge-gray { background: #334155; color: #94a3b8; }
+
+  .ok { color: #4ade80; font-size: 1rem; }
+  .no { color: #374151; font-size: 1rem; }
+  .partial { color: #fbbf24; font-size: 0.8rem; font-weight: 600; }
+
+  .stars { color: #fbbf24; letter-spacing: -1px; font-size: 0.85rem; }
+  .stars .empty { color: #334155; }
+
+  .fee { font-size: 0.78rem; color: #cbd5e1; }
+  .fee-unknown { font-size: 0.75rem; color: #475569; }
+
+  .note { font-size: 0.75rem; color: #94a3b8; max-width: 200px; text-align: left; }
+
+  .pros-cons { margin-top: 48px; }
+  .pros-cons h2 { font-size: 1.2rem; color: #f1f5f9; margin-bottom: 20px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .card { background: #1e293b; border-radius: 10px; padding: 18px; border: 1px solid #334155; }
+  .card h3 { font-size: 0.95rem; color: #f1f5f9; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .card ul { padding-left: 16px; }
+  .card li { font-size: 0.78rem; color: #94a3b8; margin-bottom: 4px; line-height: 1.5; }
+  .pros li { color: #86efac; }
+  .cons li { color: #fca5a5; }
+  .divider { border: none; border-top: 1px solid #334155; margin: 8px 0; }
+
+  .phone-section { margin-top: 48px; background: #1e293b; border-radius: 12px; padding: 24px; border: 1px solid #334155; }
+  .phone-section h2 { font-size: 1.1rem; color: #f1f5f9; margin-bottom: 16px; }
+  .checklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 24px; }
+  .check-item { background: #0f1117; border-radius: 8px; padding: 12px 14px; border: 1px solid #334155; }
+  .check-item .q { font-size: 0.75rem; color: #64748b; margin-bottom: 4px; }
+  .check-item .a { font-size: 0.8rem; color: #cbd5e1; }
+  .script { background: #0f1117; border-radius: 8px; padding: 16px; border-left: 3px solid #3b82f6; font-size: 0.82rem; color: #cbd5e1; line-height: 1.8; }
+  .script strong { color: #93c5fd; }
+</style>
+</head>
+<body>
+
+<h1>한국 정기결제 PG사 비교</h1>
+<p class="subtitle">영상제작 SaaS 구독 서비스 연동 목적 · 제외: 다날, 토스페이먼츠, 페이플</p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>업체</th>
+      <th>정기결제 방식</th>
+      <th>카드</th>
+      <th>계좌이체</th>
+      <th>가상계좌</th>
+      <th>휴대폰</th>
+      <th>초기 비용</th>
+      <th>카드 수수료</th>
+      <th>개발자 문서</th>
+      <th>별도 계약</th>
+      <th>추천도</th>
+      <th>비고</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <div class="pg-name">KG이니시스</div>
+        <div class="pg-site">inicis.com</div>
+      </td>
+      <td><span class="badge badge-blue">빌링키</span><br><span style="font-size:0.72rem;color:#64748b">결제창/API</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="fee">가입비 ~22만원</span></td>
+      <td><span class="fee">2.1~3.3%</span></td>
+      <td><span class="ok">✓</span> 충실</td>
+      <td><span class="partial">API만 별도</span></td>
+      <td><span class="stars">★★★★<span class="empty">★</span></span></td>
+      <td><div class="note">국내 최대 PG사. API 방식 심사 허들 있음</div></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="pg-name">NHN KCP</div>
+        <div class="pg-site">kcp.co.kr</div>
+      </td>
+      <td><span class="badge badge-blue">배치키</span><br><span style="font-size:0.72rem;color:#64748b">결제창/API</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="fee-unknown">별도 문의</span></td>
+      <td><span class="fee">1년 2.9% → 3.2%</span></td>
+      <td><span class="ok">✓</span> 충실</td>
+      <td><span class="partial">필요</span></td>
+      <td><span class="stars">★★★★<span class="empty">★</span></span></td>
+      <td><div class="note">정기구독 레퍼런스 다수. KCP PAY 내장</div></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="pg-name">NICE페이먼츠</div>
+        <div class="pg-site">nicepay.co.kr</div>
+      </td>
+      <td><span class="badge badge-teal">빌키(BID)</span><br><span style="font-size:0.72rem;color:#64748b">REST API</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="ok">✓</span> <span style="font-size:0.7rem;color:#64748b">더빌CMS</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="fee">33~55만원</span></td>
+      <td><span class="fee">2.9~3.5%</span></td>
+      <td><span class="ok">✓</span> GitHub 공개</td>
+      <td><span class="partial">필요</span></td>
+      <td><span class="stars">★★★★★</span></td>
+      <td><div class="note">해외 카드 지원. 샘플 코드 풍부. 계좌CMS 별도</div></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="pg-name">카카오페이</div>
+        <div class="pg-site">kakaopay.com</div>
+      </td>
+      <td><span class="badge badge-purple">SID 방식</span></td>
+      <td><span class="partial">카카오만</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="fee-unknown">별도 문의</span></td>
+      <td><span class="fee-unknown">비공개</span></td>
+      <td><span class="ok">✓</span> 충실</td>
+      <td><span class="partial">계약+검수</span></td>
+      <td><span class="stars">★★★<span class="empty">★★</span></span></td>
+      <td><div class="note">무료체험 0원 SID 발급 가능. 카카오 사용자만</div></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="pg-name">네이버페이</div>
+        <div class="pg-site">pay.naver.com</div>
+      </td>
+      <td><span class="badge badge-purple">recurrentId</span></td>
+      <td><span class="partial">네이버만</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="fee-unknown">별도 문의</span></td>
+      <td><span class="fee">1.87~3.74%</span></td>
+      <td><span class="ok">✓</span> 충실</td>
+      <td><span class="partial">검수 15일</span></td>
+      <td><span class="stars">★★★<span class="empty">★★</span></span></td>
+      <td><div class="note">PG 중간 수수료 없음. 네이버 사용자만</div></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="pg-name">페이코</div>
+        <div class="pg-site">payco.com</div>
+      </td>
+      <td><span class="badge badge-gray">자동결제 등록</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="fee-unknown">별도 문의</span></td>
+      <td><span class="fee-unknown">비공개</span></td>
+      <td><span class="partial">△ 제한적</span></td>
+      <td><span class="partial">필요</span></td>
+      <td><span class="stars">★★<span class="empty">★★★</span></span></td>
+      <td><div class="note">NHN KCP와 결합 가능. 사용자 수 적음</div></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="pg-name">스마트로</div>
+        <div class="pg-site">smartro.co.kr</div>
+      </td>
+      <td><span class="badge badge-blue">빌링키</span><br><span style="font-size:0.72rem;color:#64748b">결제창/API</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="partial">추가중</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="fee-unknown">별도 문의</span></td>
+      <td><span class="fee-unknown">비공개</span></td>
+      <td><span class="ok">✓</span> 충실</td>
+      <td><span class="partial">필요</span></td>
+      <td><span class="stars">★★★★<span class="empty">★</span></span></td>
+      <td><div class="note">본인인증 필수. 금결원 MOU로 계좌이체 확장 예정</div></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="pg-name">헥토파이낸셜</div>
+        <div class="pg-site">hectofinancial.co.kr</div>
+      </td>
+      <td><span class="badge badge-blue">빌링키</span><br><span style="font-size:0.72rem;color:#64748b">REST API만</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="ok">✓</span> 강점</td>
+      <td><span class="ok">✓</span> <span style="font-size:0.7rem;color:#4ade80">1위</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="fee-unknown">별도 문의</span></td>
+      <td><span class="fee-unknown">비공개</span></td>
+      <td><span class="ok">✓</span> <span style="font-size:0.7rem;color:#64748b">이전중</span></td>
+      <td><span class="partial">일부 별도</span></td>
+      <td><span class="stars">★★★★<span class="empty">★</span></span></td>
+      <td><div class="note">가상계좌 1위. 자동이체/펌뱅킹 특화. 구 세틀뱅크</div></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="pg-name">웰컴페이먼츠</div>
+        <div class="pg-site">welcomepayments.co.kr</div>
+      </td>
+      <td><span class="badge badge-gray">빌링키</span><br><span style="font-size:0.72rem;color:#64748b">결제창</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="fee-unknown">별도 문의</span></td>
+      <td><span class="fee-unknown">비공개</span></td>
+      <td><span class="partial">△ 제한적</span></td>
+      <td><span class="partial">필요</span></td>
+      <td><span class="stars">★★<span class="empty">★★★</span></span></td>
+      <td><div class="note">비대면 카드결제 특화. 문서 부족. 웰컴금융그룹</div></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="pg-name">갤럭시아머니트리</div>
+        <div class="pg-site">billgate.net</div>
+      </td>
+      <td><span class="badge badge-gray">빌링키</span><br><span style="font-size:0.72rem;color:#64748b">비공개</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="no">✗</span></td>
+      <td><span class="ok">✓</span></td>
+      <td><span class="fee-unknown">별도 문의</span></td>
+      <td><span class="fee-unknown">비공개</span></td>
+      <td><span class="no">✗</span> 비공개</td>
+      <td><span class="partial">필요</span></td>
+      <td><span class="stars">★★<span class="empty">★★★</span></span></td>
+      <td><div class="note">엔터/미디어 특화. API 문서 가맹 후 제공</div></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- 장단점 카드 -->
+<div class="pros-cons" style="margin-top:48px;">
+  <h2>업체별 장단점</h2>
+  <div class="cards">
+
+    <div class="card">
+      <h3>🏢 KG이니시스</h3>
+      <ul class="pros"><li>국내 최대 레퍼런스, 안정성 최상</li><li>다양한 카드사·은행 연동</li><li>WPAY 간편결제 부가서비스</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>API 방식 빌링키는 별도 심사 (까다로움)</li><li>초기 가입비 ~22만원</li><li>문서가 복잡하고 오래된 편</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>🏢 NHN KCP</h3>
+      <ul class="pros"><li>정기구독 특화 레퍼런스 다수</li><li>결제창 + API 방식 모두 지원</li><li>KCP PAY 간편결제 내장</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>자동결제는 카드만 (계좌이체 불가)</li><li>1년 후 수수료 3.2%로 오름</li><li>별도 계약 필요</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>⭐ NICE페이먼츠</h3>
+      <ul class="pros"><li>카드 + 계좌이체(더빌CMS) 동시 지원</li><li>GitHub 공개 문서 + 샘플 코드 풍부</li><li>해외 카드 결제 지원</li><li>가상계좌도 지원</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>초기 등록비 33~55만원 (비쌈)</li><li>API 직접 방식이라 개발 공수 필요</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>💛 카카오페이</h3>
+      <ul class="pros"><li>카카오톡 기반 높은 전환율</li><li>0원 SID로 무료체험 구독 구현 쉬움</li><li>UX/UI 우수</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>카카오페이 가입자만 결제 가능</li><li>할부 불가</li><li>수수료 비공개, 검수 절차 있음</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>💚 네이버페이</h3>
+      <ul class="pros"><li>PG 중간 수수료 없음</li><li>네이버 검색/쇼핑 생태계 노출 효과</li><li>일반 + 정기결제 통합 지원</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>네이버페이 사용자만 결제 가능</li><li>검수 기간 평균 15영업일</li><li>주문형/결제형 구분 필요 (복잡)</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>🔵 페이코</h3>
+      <ul class="pros"><li>NHN KCP와 결합 운영 가능</li><li>고도몰 등 NHN커머스 연동 용이</li><li>포인트 리텐션 가능</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>사용자 수 카카오/네이버 대비 적음</li><li>정기결제 API 문서 외부 공개 부족</li><li>포트원 미들웨어 의존도 높음</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>🔷 스마트로</h3>
+      <ul class="pros"><li>신규/기존 빌링 단일 API 처리</li><li>금결원 MOU — 계좌이체 정기결제 추가 예정</li><li>다양한 언어 샘플 코드 제공</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>빌링키 발급 시 휴대폰 본인인증 필수 (UX 마찰)</li><li>결제창 한국어만 지원</li><li>수수료 비공개</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>🏦 헥토파이낸셜</h3>
+      <ul class="pros"><li>가상계좌 국내 1위</li><li>계좌 자동이체(펌뱅킹) 특화</li><li>SMS/알림톡/이메일 알림 내장</li><li>결제수단 가장 다양</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>정기결제 REST API 방식만 지원 (결제창 없음)</li><li>빌링키 단독 발급은 별도 계약</li><li>개발자 문서 사이트 이전 중</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>🏦 웰컴페이먼츠</h3>
+      <ul class="pros"><li>비대면 카드결제 특화</li><li>카드번호 직접 결제(비인증) 지원</li><li>웰컴금융그룹 계열 안정성</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>대형 PG사 대비 인지도 낮음</li><li>개발자 문서 부족</li><li>포트원 V1 의존 (신규 연동 시 V2 전환 필요)</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>🎬 갤럭시아머니트리</h3>
+      <ul class="pros"><li>미디어·엔터테인먼트 결제 특화</li><li>사이버머니 + PG + B2B 쿠폰 통합</li><li>온·오프라인 통합 전자결제</li></ul>
+      <hr class="divider">
+      <ul class="cons"><li>API 문서 완전 비공개 (가맹 후 제공)</li><li>시장 인지도 낮음</li><li>정기결제 특화 기능 확인 어려움</li></ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- 전화 체크리스트 -->
+<div class="phone-section">
+  <h2>📞 전화 문의 가이드</h2>
+  <div class="checklist">
+    <div class="check-item">
+      <div class="q">확인 항목 1</div>
+      <div class="a">"빌링키 방식 정기결제 신청 시 추가 심사나 서류가 필요한가요?"</div>
+    </div>
+    <div class="check-item">
+      <div class="q">확인 항목 2</div>
+      <div class="a">"카드 외 계좌이체 기반 정기결제도 지원되나요?"</div>
+    </div>
+    <div class="check-item">
+      <div class="q">확인 항목 3</div>
+      <div class="a">"샌드박스/테스트 환경 먼저 연동해볼 수 있나요?"</div>
+    </div>
+    <div class="check-item">
+      <div class="q">확인 항목 4</div>
+      <div class="a">"구독형 SaaS 서비스 연동 사례가 있나요?"</div>
+    </div>
+    <div class="check-item">
+      <div class="q">확인 항목 5</div>
+      <div class="a">"정기결제 수수료와 정산 주기가 어떻게 되나요?"</div>
+    </div>
+    <div class="check-item">
+      <div class="q">확인 항목 6</div>
+      <div class="a">"초기 가입비나 보증금이 있나요?"</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:10px;font-size:0.82rem;color:#64748b;">공통 오프닝 멘트</div>
+  <div class="script">
+    "안녕하세요, 저는 <strong>[회사명]</strong>에서 사업 담당하고 있는 <strong>[이름]</strong>이라고 합니다.<br>
+    저희는 영상 제작 및 영상 편집을 도와주는 <strong>SaaS 프로그램을 구독 형태로 판매</strong>하는 회사인데요,<br>
+    월·연 단위 정기결제 연동이 필요해서 <strong>빌링키 방식 정기결제 가맹 신청 절차와 수수료 구조</strong>를 확인하고 싶어서 연락드렸습니다.<br>
+    담당자분 연결 가능할까요?"
+  </div>
+</div>
+
+</body>
+</html>

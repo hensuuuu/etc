@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTML to Image</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --surface2: #16213e;
+      --border: #2a2a4a;
+      --accent: #7c3aed;
+      --accent-hover: #6d28d9;
+      --accent-light: #a78bfa;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* 타이틀바 */
+    .titlebar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      -webkit-app-region: drag;
+      flex-shrink: 0;
+    }
+    .titlebar .icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--accent), #ec4899);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      -webkit-app-region: no-drag;
+    }
+    .titlebar h1 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.3px;
+    }
+    .titlebar .badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      background: var(--border);
+      border-radius: 20px;
+      color: var(--text-muted);
+    }
+
+    /* 메인 레이아웃 */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* 왼쪽 패널 - 에디터 */
+    .panel-left {
+      display: flex;
+      flex-direction: column;
+      width: 50%;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .panel-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+    }
+    .btn-group {
+      display: flex;
+      gap: 6px;
+    }
+    .btn {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      transition: all 0.15s;
+      -webkit-app-region: no-drag;
+    }
+    .btn:hover { background: var(--border); color: var(--text); }
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #html-editor {
+      flex: 1;
+      resize: none;
+      border: none;
+      outline: none;
+      padding: 16px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      background: var(--bg);
+      color: #c9d1d9;
+      tab-size: 2;
+      caret-color: var(--accent-light);
+    }
+
+    /* 오른쪽 패널 - 미리보기 & 설정 */
+    .panel-right {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* 설정 바 */
+    .settings-bar {
+      padding: 10px 16px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .setting-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .setting-item input[type="number"] {
+      width: 70px;
+      padding: 4px 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text);
+      font-size: 12px;
+      outline: none;
+      -webkit-app-region: no-drag;
+    }
+    .setting-item input[type="number"]:focus { border-color: var(--accent); }
+    .setting-item select {
+      padding: 4px 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text);
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+      -webkit-app-region: no-drag;
+    }
+    .setting-item select:focus { border-color: var(--accent); }
+
+    /* 미리보기 */
+    .preview-wrapper {
+      flex: 1;
+      overflow: auto;
+      background: repeating-conic-gradient(#1e1e2e 0% 25%, #181828 0% 50%) 0 0 / 20px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px;
+    }
+    .preview-container {
+      position: relative;
+      background: #fff;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    #preview-frame {
+      border: none;
+      display: block;
+    }
+    .preview-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--text-muted);
+      padding: 60px;
+      text-align: center;
+    }
+    .preview-placeholder .icon-big { font-size: 48px; opacity: 0.3; }
+    .preview-placeholder p { font-size: 14px; }
+
+    /* 하단 액션 바 */
+    .action-bar {
+      padding: 12px 16px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .btn-capture {
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #ec4899);
+      color: #fff;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      -webkit-app-region: no-drag;
+    }
+    .btn-capture:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-capture:active { transform: translateY(0); }
+    .btn-capture:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-save {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      -webkit-app-region: no-drag;
+    }
+    .btn-save:hover { background: var(--border); }
+    .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .status-msg {
+      margin-left: auto;
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      display: none;
+    }
+    .status-msg.show { display: block; }
+    .status-msg.success { background: rgba(16,185,129,0.15); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+    .status-msg.error { background: rgba(239,68,68,0.15); color: var(--error); border: 1px solid rgba(239,68,68,0.3); }
+    .status-msg.loading { background: rgba(124,58,237,0.15); color: var(--accent-light); border: 1px solid rgba(124,58,237,0.3); }
+
+    /* 스피너 */
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .spinner.show { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 이미지 크기 정보 */
+    .size-info {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    /* 탭 */
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      flex-shrink: 0;
+    }
+    .tab {
+      padding: 9px 18px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      -webkit-app-region: no-drag;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent-light); border-bottom-color: var(--accent); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* 결과 이미지 뷰 */
+    .result-view {
+      flex: 1;
+      overflow: auto;
+      background: repeating-conic-gradient(#1e1e2e 0% 25%, #181828 0% 50%) 0 0 / 20px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px;
+    }
+    #result-img {
+      max-width: 100%;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      border-radius: 4px;
+      display: none;
+    }
+    .result-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--text-muted);
+      padding: 60px;
+      text-align: center;
+    }
+    .result-placeholder .icon-big { font-size: 48px; opacity: 0.3; }
+
+    /* 스크롤바 */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a3a5a; }
+  </style>
+</head>
+<body>
+
+<div class="titlebar">
+  <div class="icon">🖼</div>
+  <h1>HTML to Image</h1>
+  <span class="badge">v1.0</span>
+</div>
+
+<div class="main">
+  <!-- 왼쪽: 코드 에디터 -->
+  <div class="panel-left">
+    <div class="panel-header">
+      <span class="panel-label">HTML 코드</span>
+      <div class="btn-group">
+        <button class="btn" id="btn-sample">예제 불러오기</button>
+        <button class="btn" id="btn-clear">지우기</button>
+      </div>
+    </div>
+    <textarea id="html-editor" spellcheck="false" placeholder="여기에 HTML 코드를 입력하세요...
+
+<!DOCTYPE html>
+<html>
+<body>
+  <h1>Hello World</h1>
+</body>
+</html>"></textarea>
+  </div>
+
+  <!-- 오른쪽: 미리보기 + 결과 -->
+  <div class="panel-right">
+    <div class="settings-bar">
+      <div class="setting-item">
+        <span class="setting-label">너비</span>
+        <input type="number" id="width-input" value="1200" min="100" max="5000" step="10" />
+        <span class="setting-label">px</span>
+      </div>
+      <div class="setting-item">
+        <span class="setting-label">높이</span>
+        <input type="number" id="height-input" value="630" min="100" max="5000" step="10" />
+        <span class="setting-label">px</span>
+      </div>
+      <div class="setting-item">
+        <span class="setting-label">포맷</span>
+        <select id="format-select">
+          <option value="png">PNG</option>
+          <option value="jpg">JPG</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <span class="setting-label">프리셋</span>
+        <select id="preset-select">
+          <option value="">직접 입력</option>
+          <option value="1200,630">OG 이미지 (1200×630)</option>
+          <option value="1080,1080">인스타그램 (1080×1080)</option>
+          <option value="1920,1080">Full HD (1920×1080)</option>
+          <option value="1280,720">HD (1280×720)</option>
+          <option value="800,600">800×600</option>
+          <option value="375,812">모바일 (375×812)</option>
+          <option value="2560,1440">QHD (2560×1440)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="preview">미리보기</div>
+      <div class="tab" data-tab="result">캡처 결과</div>
+    </div>
+
+    <!-- 미리보기 탭 -->
+    <div class="tab-content active" id="tab-preview">
+      <div class="preview-wrapper" id="preview-wrapper">
+        <div class="preview-placeholder" id="preview-placeholder">
+          <div class="icon-big">📄</div>
+          <p>왼쪽에 HTML을 입력하고<br><strong>미리보기 업데이트</strong>를 누르세요</p>
+        </div>
+        <div class="preview-container" id="preview-container" style="display:none;">
+          <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 탭 -->
+    <div class="tab-content" id="tab-result">
+      <div class="result-view">
+        <div class="result-placeholder" id="result-placeholder">
+          <div class="icon-big">🎨</div>
+          <p>캡처 버튼을 눌러<br>이미지를 생성하세요</p>
+        </div>
+        <img id="result-img" alt="캡처 결과" />
+      </div>
+    </div>
+
+    <!-- 액션 바 -->
+    <div class="action-bar">
+      <button class="btn" id="btn-preview">
+        👁 미리보기 업데이트
+      </button>
+      <button class="btn-capture" id="btn-capture" disabled>
+        <span class="spinner" id="spinner"></span>
+        <span id="capture-text">📸 이미지 캡처</span>
+      </button>
+      <button class="btn-save" id="btn-save" disabled>
+        💾 저장
+      </button>
+      <div class="status-msg" id="status-msg"></div>
+      <span class="size-info" id="size-info"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+const { ipcRenderer } = require('electron');
+
+let capturedBuffer = null;
+let capturedFormat = 'png';
+
+const editor = document.getElementById('html-editor');
+const previewFrame = document.getElementById('preview-frame');
+const previewContainer = document.getElementById('preview-container');
+const previewPlaceholder = document.getElementById('preview-placeholder');
+const widthInput = document.getElementById('width-input');
+const heightInput = document.getElementById('height-input');
+const formatSelect = document.getElementById('format-select');
+const presetSelect = document.getElementById('preset-select');
+const btnCapture = document.getElementById('btn-capture');
+const btnSave = document.getElementById('btn-save');
+const btnPreview = document.getElementById('btn-preview');
+const btnSample = document.getElementById('btn-sample');
+const btnClear = document.getElementById('btn-clear');
+const spinner = document.getElementById('spinner');
+const captureText = document.getElementById('capture-text');
+const statusMsg = document.getElementById('status-msg');
+const resultImg = document.getElementById('result-img');
+const resultPlaceholder = document.getElementById('result-placeholder');
+const sizeInfo = document.getElementById('size-info');
+
+// 탭 전환
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// 프리셋 변경
+presetSelect.addEventListener('change', () => {
+  const val = presetSelect.value;
+  if (!val) return;
+  const [w, h] = val.split(',');
+  widthInput.value = w;
+  heightInput.value = h;
+});
+
+// 에디터 Tab 키 지원
+editor.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
+    editor.selectionStart = editor.selectionEnd = start + 2;
+  }
+});
+
+// 코드 입력 시 캡처 버튼 활성화
+editor.addEventListener('input', () => {
+  btnCapture.disabled = editor.value.trim() === '';
+});
+
+// 미리보기 업데이트
+function updatePreview() {
+  const html = editor.value.trim();
+  if (!html) {
+    previewContainer.style.display = 'none';
+    previewPlaceholder.style.display = 'flex';
+    return;
+  }
+
+  const w = parseInt(widthInput.value) || 1200;
+  const h = parseInt(heightInput.value) || 630;
+
+  previewContainer.style.display = 'block';
+  previewPlaceholder.style.display = 'none';
+
+  // 미리보기는 스케일 조정 (최대 너비 맞춤)
+  const wrapper = document.getElementById('preview-wrapper');
+  const maxW = wrapper.clientWidth - 40;
+  const scale = Math.min(1, maxW / w);
+
+  previewFrame.style.width = w + 'px';
+  previewFrame.style.height = h + 'px';
+  previewContainer.style.width = (w * scale) + 'px';
+  previewContainer.style.height = (h * scale) + 'px';
+  previewFrame.style.transform = `scale(${scale})`;
+  previewFrame.style.transformOrigin = 'top left';
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  previewFrame.src = url;
+
+  // 탭을 미리보기로 전환
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector('[data-tab="preview"]').classList.add('active');
+  document.getElementById('tab-preview').classList.add('active');
+}
+
+btnPreview.addEventListener('click', updatePreview);
+
+// Ctrl+Enter로 미리보기
+editor.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'Enter') updatePreview();
+});
+
+// 캡처
+btnCapture.addEventListener('click', async () => {
+  const html = editor.value.trim();
+  if (!html) return;
+
+  const w = parseInt(widthInput.value) || 1200;
+  const h = parseInt(heightInput.value) || 630;
+  const format = formatSelect.value;
+
+  setLoading(true);
+  showStatus('렌더링 중...', 'loading');
+
+  try {
+    const result = await ipcRenderer.invoke('capture-html', { html, width: w, height: h, format });
+
+    if (result.success) {
+      capturedBuffer = result.buffer;
+      capturedFormat = format;
+
+      // 결과 이미지 표시
+      const uint8 = new Uint8Array(result.buffer);
+      const blob = new Blob([uint8], { type: format === 'jpg' ? 'image/jpeg' : 'image/png' });
+      const url = URL.createObjectURL(blob);
+      resultImg.src = url;
+      resultImg.style.display = 'block';
+      resultPlaceholder.style.display = 'none';
+
+      sizeInfo.textContent = `${result.width} × ${result.height}px`;
+      btnSave.disabled = false;
+
+      // 결과 탭으로 전환
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('[data-tab="result"]').classList.add('active');
+      document.getElementById('tab-result').classList.add('active');
+
+      showStatus('캡처 완료!', 'success');
+    } else {
+      showStatus('캡처 실패: ' + result.error, 'error');
+    }
+  } catch (err) {
+    showStatus('오류: ' + err.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+});
+
+// 저장
+btnSave.addEventListener('click', async () => {
+  if (!capturedBuffer) return;
+
+  try {
+    const result = await ipcRenderer.invoke('save-image', {
+      buffer: capturedBuffer,
+      format: capturedFormat,
+      defaultName: 'html-image-' + Date.now(),
+    });
+
+    if (!result.canceled) {
+      showStatus('저장 완료: ' + result.filePath, 'success');
+      // 파일 탐색기에서 열기 옵션
+      if (confirm('저장되었습니다!\n\n파일 위치를 열어볼까요?')) {
+        await ipcRenderer.invoke('show-in-folder', result.filePath);
+      }
+    }
+  } catch (err) {
+    showStatus('저장 실패: ' + err.message, 'error');
+  }
+});
+
+// 예제 불러오기
+btnSample.addEventListener('click', () => {
+  editor.value = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    width: 1200px; height: 630px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+  }
+  .card {
+    text-align: center;
+    padding: 60px;
+  }
+  h1 {
+    font-size: 64px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a78bfa, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+  }
+  p {
+    font-size: 24px;
+    color: #94a3b8;
+    line-height: 1.6;
+  }
+  .tag {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 8px 20px;
+    background: rgba(124,58,237,0.3);
+    border: 1px solid rgba(124,58,237,0.5);
+    border-radius: 20px;
+    font-size: 14px;
+    color: #a78bfa;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>HTML to Image</h1>
+    <p>HTML 코드를 아름다운 이미지로<br>변환해보세요</p>
+    <span class="tag">✨ Electron 기반 PC 앱</span>
+  </div>
+</body>
+</html>`;
+  btnCapture.disabled = false;
+  updatePreview();
+});
+
+// 지우기
+btnClear.addEventListener('click', () => {
+  if (editor.value && confirm('코드를 모두 지우시겠습니까?')) {
+    editor.value = '';
+    btnCapture.disabled = true;
+    previewContainer.style.display = 'none';
+    previewPlaceholder.style.display = 'flex';
+  }
+});
+
+function setLoading(v) {
+  spinner.classList.toggle('show', v);
+  captureText.textContent = v ? '캡처 중...' : '📸 이미지 캡처';
+  btnCapture.disabled = v;
+}
+
+let statusTimer;
+function showStatus(msg, type) {
+  statusMsg.textContent = msg;
+  statusMsg.className = 'status-msg show ' + type;
+  clearTimeout(statusTimer);
+  if (type !== 'loading') {
+    statusTimer = setTimeout(() => statusMsg.classList.remove('show'), 4000);
+  }
+}
+</script>
+</body>
+</html>
